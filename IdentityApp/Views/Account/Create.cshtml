@@ -1,0 +1,38 @@
+@model CreateViewModel
+<h2>Kullanıcı Ekle</h2>
+<hr>
+<form asp-controller="Account" asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+  <div class="mb-3">
+    <label asp-for="UserName"></label>
+    <input asp-for="UserName" class="form-control"></input>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="FulName"></label>
+    <input asp-for="FulName" class="form-control"></input>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="Email"></label>
+    <input asp-for="Email" class="form-control"></input>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="PhoneNumber"></label>
+    <input asp-for="PhoneNumber" class="form-control"></input>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="Password"></label>
+    <input asp-for="Password" class="form-control"></input>
+  </div>
+
+  <div class="mb-3">
+    <label asp-for="ConfirmPassword"></label>
+    <input asp-for="ConfirmPassword" class="form-control"></input>
+  </div>
+
+  
+  <button asp-controller="Account" asp-actions="Login" class="btn btn-primary">Kaydet</button>
+</form>

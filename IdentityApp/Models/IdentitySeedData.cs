@@ -16,13 +16,14 @@ namespace IdentityApp.Models
                 context.Database.Migrate();
             }
 
-            var userManager=app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager=app.ApplicationServices.CreateScope().ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
             var user= await userManager.FindByNameAsync(adminUser);
 
             if(user==null){
-                user=new IdentityUser{
+                user=new AppUser{
                     UserName=adminUser,
+                    FulName="Sidar",
                     Email="mehmetsidar@gmail.com",
                     PhoneNumber="05438729660"
                 };

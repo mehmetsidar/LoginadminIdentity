@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@if(TempData["message"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["message"]
+    </div>
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -18,11 +24,47 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"asp-controller="User" asp-action="Index">Kullanıcı</a>
-                        </li>
-                   
+                    <ul class="navbar-nav ">
+                        @if(User.Identity?.IsAuthenticated==true)
+                        {
+                            @if(User.IsInRole("Adminn"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="User" asp-action="Index">Kullanıcı</a>
+                                </li>
+        
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Roles" asp-action="Index">Kullanıcı Roleri</a>
+                                </li>
+                            }
+                        }
+                      
+
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto">
+                        @if(User.Identity?.IsAuthenticated==true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark">Merhaba, @User.Identity.Name</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Çıkş</a>
+                            </li>
+                        }
+                        else{
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Giriş</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Create">Kayıt Ol</a>
+                            </li>
+                        }
+                      
+
+                        
                     </ul>
                 </div>
             </div>
