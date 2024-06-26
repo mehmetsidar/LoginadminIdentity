@@ -2714,11 +2714,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\LoginadminIdentity\\IdentityApp\\IdentityApp.csproj",
+      "projectUniqueName": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\Şirket\\LoginadminIdentity\\IdentityApp\\IdentityApp.csproj",
       "projectName": "IdentityApp",
-      "projectPath": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\LoginadminIdentity\\IdentityApp\\IdentityApp.csproj",
+      "projectPath": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\Şirket\\LoginadminIdentity\\IdentityApp\\IdentityApp.csproj",
       "packagesPath": "C:\\Users\\Simge Bilgisayar\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\LoginadminIdentity\\IdentityApp\\obj\\",
+      "outputPath": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\Şirket\\LoginadminIdentity\\IdentityApp\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

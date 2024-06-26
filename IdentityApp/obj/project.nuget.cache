@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "xnRD/Xg3EaP6yUgRSqutsrHUAF7/gU3a0fhogdp8x+MaCNZHjY3E2NrJxJSk52YdSXqfZ6zyWaV6SHSaZCJhxQ==",
+  "dgSpecHash": "bdFlc4JzaN7/0cAihd+IxZjUy8pi4/TcBBdO9CH767/gCsq8KYNHDT2jUlw0VrOQaVJc3ywY6EfiD26buKLUpQ==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\LoginadminIdentity\\IdentityApp\\IdentityApp.csproj",
+  "projectFilePath": "C:\\Users\\Simge Bilgisayar\\OneDrive\\Masaüstü\\Şirket\\LoginadminIdentity\\IdentityApp\\IdentityApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Simge Bilgisayar\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Simge Bilgisayar\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\8.0.6\\microsoft.aspnetcore.cryptography.internal.8.0.6.nupkg.sha512",

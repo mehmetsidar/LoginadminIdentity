@@ -2,32 +2,30 @@ using IdentityApp.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using IdentityApp.Models;
-
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace IdentityApp.Controllers
 {
     public class AccountController : Controller
     {
-        private UserManager<AppUser> _userManager;
-
-        private RoleManager<AppRole> _roleManager;
-
-
-        private SignInManager<AppUser> _singInManager;
-        private IEmailSender _emailSender;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<AppRole> _roleManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly IEmailSender _emailSender;
 
         public AccountController(
-        UserManager<AppUser> userManager,
-        RoleManager<AppRole> roleManager,
-        SignInManager<AppUser> singInManager,
-        IEmailSender emailSender
-        )
+            UserManager<AppUser> userManager,
+            RoleManager<AppRole> roleManager,
+            SignInManager<AppUser> signInManager,
+            IEmailSender emailSender)
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _singInManager = singInManager;
+            _signInManager = signInManager;
             _emailSender = emailSender;
         }
+
         public IActionResult Login()
         {
             return View();
@@ -38,11 +36,19 @@ namespace IdentityApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var users = await _userManager.Users.Where(u => u.Email == model.Email).ToListAsync();
+
+                if (users.Count > 1)
+                {
+                    ModelState.AddModelError("", "Aynı e-posta adresine sahip birden fazla kullanıcı bulundu.");
+                    return View(model);
+                }
+
+                var user = users.SingleOrDefault();
 
                 if (user != null)
                 {
-                    await _singInManager.SignOutAsync();
+                    await _signInManager.SignOutAsync();
 
                     if (!await _userManager.IsEmailConfirmedAsync(user))
                     {
@@ -50,7 +56,7 @@ namespace IdentityApp.Controllers
                         return View(model);
                     }
 
-                    var result = await _singInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
+                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
                     if (result.Succeeded)
                     {
                         await _userManager.ResetAccessFailedCountAsync(user);
@@ -60,46 +66,51 @@ namespace IdentityApp.Controllers
                     }
                     else if (result.IsLockedOut)
                     {
-                        var lockouDate = await _userManager.GetLockoutEndDateAsync(user);
-                        var timeLeft = lockouDate.Value - DateTime.UtcNow;
-                        ModelState.AddModelError("", $"Hesabınız Kitlendi, Lütfen{timeLeft.Minutes} dakika sonra deneyiniz");
+                        var lockoutDate = await _userManager.GetLockoutEndDateAsync(user);
+                        var timeLeft = lockoutDate.Value - DateTime.UtcNow;
+                        ModelState.AddModelError("", $"Hesabınız kilitlendi, lütfen {timeLeft.Minutes} dakika sonra tekrar deneyin.");
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Hatalı Parola");
+                        ModelState.AddModelError("", "Hatalı parola");
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Hatalı Email");
+                    ModelState.AddModelError("", "Hatalı e-posta");
                 }
             }
-            return View();
+            return View(model);
         }
-
-
 
         public IActionResult Create()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var user = new AppUser { UserName = model.UserName, Email = model.Email, PhoneNumber = model.PhoneNumber, FulName = model.FulName };
+                var user = new AppUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    PhoneNumber = model.PhoneNumber,
+                    FulName = model.FulName
+                };
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
                     var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var url = Url.Action("ConfirEmail", "Account", new { user.Id, token });
+                    var url = Url.Action("ConfirmEmail", "Account", new { user.Id, token });
 
-                    //Email
+                    // Email
                     await _emailSender.SendEmailAsync(user.Email, "Hesap Onayı",
-                    $"Lütfen Email Hesabınızı Onaylamak İçin Linke <a href='http://localhost:5011{url}'>Tıklayınız</a>");
+                        $"Lütfen e-posta hesabınızı onaylamak için <a href='http://localhost:5011{url}'>tıklayınız</a>.");
 
-                    TempData["message"] = "Email Hesabınızdaki Onay Mailine Tıklayın";
+                    TempData["message"] = "E-posta hesabınızdaki onay mailine tıklayın.";
                     return RedirectToAction("Login", "Account");
                 }
                 foreach (IdentityError err in result.Errors)
@@ -107,14 +118,14 @@ namespace IdentityApp.Controllers
                     ModelState.AddModelError("", err.Description);
                 }
             }
-            return View();
+            return View(model);
         }
 
-        public async Task<IActionResult> ConfirEmail(string Id, string token)
+        public async Task<IActionResult> ConfirmEmail(string Id, string token)
         {
-            if (Id == null || token == null)
+            if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(token))
             {
-                TempData["message"] = "Gecersiz Token";
+                TempData["message"] = "Geçersiz token";
                 return View();
             }
             var user = await _userManager.FindByIdAsync(Id);
@@ -123,20 +134,18 @@ namespace IdentityApp.Controllers
                 var result = await _userManager.ConfirmEmailAsync(user, token);
                 if (result.Succeeded)
                 {
-                    TempData["message"] = "Hesabınız Onaylandı";
+                    TempData["message"] = "Hesabınız onaylandı.";
                     return RedirectToAction("Login", "Account");
                 }
             }
 
-            TempData["message"] = "Kullanıcı Bulunamadı";
+            TempData["message"] = "Kullanıcı bulunamadı.";
             return View();
-
         }
-
 
         public async Task<IActionResult> Logout()
         {
-            await _singInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
 
@@ -145,37 +154,27 @@ namespace IdentityApp.Controllers
             return View();
         }
 
-        public async Task<IActionResult> ForgotPasswordWithEmail(string Email)
+        [HttpPost]
+        public async Task<IActionResult> ForgotPasswordWithEmail(string email)
         {
-            if (string.IsNullOrEmpty(Email))
+            if (string.IsNullOrEmpty(email))
             {
-                TempData["message"] = "Eposta Adresinizi Giriniz";
+                TempData["message"] = "E-posta adresinizi giriniz.";
                 return View();
             }
 
-            var user = await _userManager.FindByEmailAsync(Email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                TempData["message"] = "Eposta Adresi ile eşleşen bir hesap bulunamadı";
+                TempData["message"] = "E-posta adresi ile eşleşen bir hesap bulunamadı.";
                 return View();
             }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var url = Url.Action("ResetPassword", "Account", new { user.Id, token });
-            await _emailSender.SendEmailAsync(Email, "Parolayı Sıfırlama", $"Parolanızı Yenilemek İçin Linke <a href='http://localhost:5011{url}'>Tıklayınız</a>.");
-            TempData["message"] = "Eposta Adresinize Gönderilen Link ile şifrenizi Sıfırlayabilriisniz";
+            await _emailSender.SendEmailAsync(email, "Parolayı Sıfırlama", $"Parolanızı yenilemek için <a href='http://localhost:5011{url}'>tıklayınız</a>.");
+            TempData["message"] = "E-posta adresinize gönderilen link ile şifrenizi sıfırlayabilirsiniz.";
             return View();
         }
-
-        
-
-
-        // public IActionResult ResetPassword(string Id,string token)
-        // {
-
-        // }
-
-
-
     }
 }
