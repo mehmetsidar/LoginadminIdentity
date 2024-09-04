@@ -13,3 +13,7 @@ Bu projede aşağıdaki teknolojiler ve araçlar kullanılmıştır:
 
 - **SQL**:  
   Veritabanı yönetimi ve veri sorgulama işlemleri için kullanılan bir dil. Projede veri saklama ve yönetimi için SQL kullanılmıştır.
+
+- **C#**:  
+  Microsoft tarafından geliştirilen, güçlü ve esnek bir programlama dili. Projenin ana geliştirme dili olarak kullanılmıştır.
+
